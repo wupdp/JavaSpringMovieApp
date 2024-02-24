@@ -11,9 +11,9 @@ import java.io.IOException;
 @Component
 public class KinopoiskAPI {
 
-   /* @Value("${kinopoisk.apikey}")
-    private String apiKey;*/
-    private static final String API_KEY = "9AXTNXV-6Z7M2EQ-K20RAMR-4CR1ZAE";
+    @Value("${kinopoisk.apikey}")
+    private String apiKey;
+    //private static final String API_KEY = "9AXTNXV-6Z7M2EQ-K20RAMR-4CR1ZAE";
 
     private static final String API_URL = "https://api.kinopoisk.dev/v1.4/movie/search";
 
@@ -28,7 +28,7 @@ public class KinopoiskAPI {
                 .url(API_URL + "?page=1&limit=10&query=" + query)
                 .get()
                 .addHeader("accept", "application/json")
-                .addHeader("X-API-KEY", API_KEY)
+                .addHeader("X-API-KEY", apiKey)
                 .build();
 
         return client.newCall(request).execute().body();
