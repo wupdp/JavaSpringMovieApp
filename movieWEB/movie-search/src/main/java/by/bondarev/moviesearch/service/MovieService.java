@@ -1,15 +1,15 @@
-package by.bondarev.moviesearch.dao;
+package by.bondarev.moviesearch.service;
 
 import by.bondarev.moviesearch.kinopoiskAPI.KinopoiskAPI;
+import org.springframework.stereotype.Service;
 
-import org.springframework.stereotype.Component;
 import java.io.IOException;
 
-@Component
-public class MovieDAO {
+@Service
+public class MovieService {
     private final KinopoiskAPI kinopoiskAPI;
 
-    public MovieDAO(KinopoiskAPI kinopoiskAPI) {
+    public MovieService(KinopoiskAPI kinopoiskAPI) {
         this.kinopoiskAPI = kinopoiskAPI;
     }
 
