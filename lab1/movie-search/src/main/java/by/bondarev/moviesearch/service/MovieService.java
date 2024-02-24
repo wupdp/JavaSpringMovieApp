@@ -1,19 +1,19 @@
 package by.bondarev.moviesearch.service;
 
-import by.bondarev.moviesearch.dao.MovieDAO;
+import by.bondarev.moviesearch.kinopoiskAPI.KinopoiskAPI;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
 @Service
 public class MovieService {
-    private final MovieDAO movieDAO;
+    private final KinopoiskAPI kinopoiskAPI;
 
-    public MovieService(MovieDAO movieDAO) {
-        this.movieDAO = movieDAO;
+    public MovieService(KinopoiskAPI kinopoiskAPI) {
+        this.kinopoiskAPI = kinopoiskAPI;
     }
 
     public String getMovieInfo(String title) throws IOException {
-        return movieDAO.getMovieInfo(title);
+        return kinopoiskAPI.searchMovie(title).string();
     }
 }
