@@ -1,6 +1,6 @@
 package by.bondarev.moviesearch.service;
 
-import by.bondarev.moviesearch.kinopoiskAPI.KinopoiskAPI;
+import by.bondarev.moviesearch.kinopoiskapi.KinopoiskAPI;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
