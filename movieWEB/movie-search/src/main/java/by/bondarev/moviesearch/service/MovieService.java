@@ -1,6 +1,7 @@
 package by.bondarev.moviesearch.service;
 
 import by.bondarev.moviesearch.kinopoiskAPI.KinopoiskAPI;
+import okhttp3.ResponseBody;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -14,6 +15,6 @@ public class MovieService {
     }
 
     public String getMovieInfo(String title) throws IOException {
-        return kinopoiskAPI.searchMovie(title).string();
+        return kinopoiskAPI.searchMovie(title);
     }
 }
