@@ -1,7 +1,18 @@
-FROM openjdk:11-jre-slim
+FROM maven AS build
 
 WORKDIR /app
 
-COPY target/movie-search-1.0-SNAPSHOT.jar /app/movie-search.jar
+COPY ./src ./src
+COPY ./pom.xml ./
 
-CMD ["java", "-jar", "movie-search.jar"]
+RUN mvn clean install
+
+FROM openjdk:17-jdk-slim AS RUN
+
+WORKDIR /app
+
+COPY --from=build /app/target/*.jar /app/web-movie.jar
+
+EXPOSE 8081
+
+CMD ["java", "-jar", "web-movie.jar"]
