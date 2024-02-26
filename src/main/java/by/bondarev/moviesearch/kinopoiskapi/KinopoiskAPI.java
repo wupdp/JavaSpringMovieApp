@@ -1,4 +1,4 @@
-package by.bondarev.moviesearch.kinopoiskAPI;
+package by.bondarev.moviesearch.kinopoiskapi;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
