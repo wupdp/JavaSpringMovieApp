@@ -1,7 +1,6 @@
 package by.bondarev.moviesearch.service;
 
 import by.bondarev.moviesearch.kinopoiskAPI.KinopoiskAPI;
-import okhttp3.ResponseBody;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
