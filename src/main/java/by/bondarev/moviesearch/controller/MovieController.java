@@ -1,11 +1,14 @@
 package by.bondarev.moviesearch.controller;
 
 import by.bondarev.moviesearch.service.MovieService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+
 import java.io.IOException;
 
 @RestController
@@ -17,6 +20,10 @@ public class MovieController {
         this.movieService = movieService;
     }
 
+    @Value("${other.service.ip}")
+    String ip;
+    @Value("${other.service.port}")
+    String port;
     @GetMapping("/movie/info")
     public ResponseEntity<String> getMovieInfo(@RequestParam("title") String title) {
         try {
@@ -29,6 +36,11 @@ public class MovieController {
 
     @GetMapping("/hello")
     public ResponseEntity<String> getHello() {
+        String url = "http://" + ip + ":" + port + "/";
 
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
     }
 }
