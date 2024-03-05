@@ -26,4 +26,9 @@ public class MovieController {
             return new ResponseEntity<>("Error getting movie info", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/hello")
+    public ResponseEntity<String> getHello() {
+
+    }
 }
