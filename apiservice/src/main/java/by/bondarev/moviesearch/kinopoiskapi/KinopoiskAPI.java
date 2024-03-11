@@ -14,7 +14,8 @@ public class KinopoiskAPI {
     @Value("${kinopoisk.apikey}")
     private String apiKey;
 
-    private static final String API_URL = "https://api.kinopoisk.dev/v1.4/";
+    @Value("${kinopoisk.url}")
+    private String apiUrl;
 
     private final OkHttpClient client;
 
@@ -22,14 +23,34 @@ public class KinopoiskAPI {
         this.client = new OkHttpClient();
     }
 
-    public String searchMovie(String query) throws IOException {
+    private String makeRequest(String url) throws IOException {
         Request request = new Request.Builder()
-                .url(API_URL + "movie/search?page=1&limit=10&query=" + query)
+                .url(url)
                 .get()
                 .addHeader("accept", "application/json")
                 .addHeader("X-API-KEY", apiKey)
                 .build();
 
         return Objects.requireNonNull(client.newCall(request).execute().body()).string();
+    }
+    //Movie requests
+    public String searchMovieByName(String query) throws IOException {
+        String url = apiUrl + "movie/search?page=1&limit=1&query=" + query;
+        return makeRequest(url);
+    }
+
+    public String searchRandomAnime() throws IOException {
+        String url = apiUrl + "movie/random?notNullFields=name&type=anime";
+        return makeRequest(url);
+    }
+    public String searchRandomMovie() throws IOException {
+        String url = apiUrl + "movie/random?notNullFields=name";
+        return makeRequest(url);
+    }
+
+    //List info
+    public String getListOf(String field) throws IOException {
+        String url = "https://api.kinopoisk.dev/v1/movie/possible-values-by-field?field=" + field;
+        return makeRequest(url);
     }
 }

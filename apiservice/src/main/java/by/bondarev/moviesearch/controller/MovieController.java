@@ -26,4 +26,34 @@ public class MovieController {
             return new ResponseEntity<>("Error getting movie info", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @GetMapping("/movie/random/anime")
+    public ResponseEntity<String> getRandomAnime() {
+        try {
+            String animeInfo = movieService.getRandomAnime();
+            return ResponseEntity.ok(animeInfo);
+        } catch (IOException e) {
+            return new ResponseEntity<>("Error getting anime. Chill, we work with this problem ;))", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/movie/random")
+    public ResponseEntity<String> getRandomMovie() {
+        try {
+            String movieInfo = movieService.getRandomMovie();
+            return ResponseEntity.ok(movieInfo);
+        } catch (IOException e) {
+            return new ResponseEntity<>("Error getting movie. Chill, we work with this problem ;))", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/values")
+    public ResponseEntity<String> getValuesByField(@RequestParam("field") String field) {
+        try {
+            String listByField = movieService.getPossibleValuesByField(field);
+            return ResponseEntity.ok(listByField);
+        } catch (IOException e) {
+            return new ResponseEntity<>("Error getting list. Chill, we work with this problem ;))", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
