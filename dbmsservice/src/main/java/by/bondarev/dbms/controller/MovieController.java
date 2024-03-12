@@ -1,5 +1,6 @@
 package by.bondarev.dbms.controller;
 
+import by.bondarev.dbms.dto.MovieDTO;
 import by.bondarev.dbms.model.Movie;
 import by.bondarev.dbms.service.MovieService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class MovieController {
     }
 
     @PostMapping
-    public Movie saveMovie(@RequestBody Movie movie) {
+    public Movie saveMovie(@RequestBody MovieDTO movie) {
         return movieService.saveMovie(movie);
     }
 
