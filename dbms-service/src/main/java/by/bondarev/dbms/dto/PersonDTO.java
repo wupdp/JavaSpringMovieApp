@@ -1,32 +1,27 @@
 package by.bondarev.dbms.dto;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Set;
+
+@Setter
+@Getter
 public class PersonDTO {
     private Long id;
     private String name;
     private String description;
+    private Set<MovieDTO> movies;
 
-    public Long getId() {
-        return id;
+    public String toJSON() throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(this);
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    public static PersonDTO fromJSON(String json) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(json, PersonDTO.class);
     }
 }
-

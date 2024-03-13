@@ -1,10 +1,15 @@
 package by.bondarev.dbms.model;
 
+import by.bondarev.dbms.dto.CountryDTO;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Setter
+@Getter
 @Entity
 public class Country {
 
@@ -17,29 +22,17 @@ public class Country {
     @ManyToMany(mappedBy = "countries")
     private Set<Movie> movies = new HashSet<>();
 
-    public Long getId() {
-        return id;
+    public CountryDTO toDTO() {
+        CountryDTO countryDTO = new CountryDTO();
+        countryDTO.setId(this.id);
+        countryDTO.setName(this.name);
+        return countryDTO;
     }
 
-    public String getName() {
-        return name;
+    public static Country fromDTO(CountryDTO countryDTO) {
+        Country country = new Country();
+        country.setId(countryDTO.getId());
+        country.setName(countryDTO.getName());
+        return country;
     }
-
-    public Set<Movie> getMovies() {
-        return movies;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setMovies(Set<Movie> movies) {
-        this.movies = movies;
-    }
-
-
 }

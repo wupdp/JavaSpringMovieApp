@@ -2,7 +2,14 @@ package by.bondarev.dbms.model;
 
 import by.bondarev.dbms.dto.PersonDTO;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
+
+@Setter
+@Getter
 @Entity
 public class Person {
 
@@ -14,41 +21,8 @@ public class Person {
 
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "movie_id")
-    private Movie movie;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Movie getMovie() {
-        return movie;
-    }
-
-    public void setMovie(Movie movie) {
-        this.movie = movie;
-    }
+    @ManyToMany(mappedBy = "persons")
+    private Set<Movie> movies = new HashSet<>();
 
     public PersonDTO toDTO() {
         PersonDTO personDTO = new PersonDTO();
@@ -56,5 +30,13 @@ public class Person {
         personDTO.setName(this.name);
         personDTO.setDescription(this.description);
         return personDTO;
+    }
+
+    public static Person fromDTO(PersonDTO personDTO) {
+        Person person = new Person();
+        person.setId(personDTO.getId());
+        person.setName(personDTO.getName());
+        person.setDescription(personDTO.getDescription());
+        return person;
     }
 }

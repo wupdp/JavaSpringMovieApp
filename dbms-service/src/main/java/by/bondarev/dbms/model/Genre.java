@@ -1,10 +1,15 @@
 package by.bondarev.dbms.model;
 
+import by.bondarev.dbms.dto.GenreDTO;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@Setter
+@Getter
 @Entity
 public class Genre {
     @Id
@@ -16,27 +21,18 @@ public class Genre {
     @ManyToMany(mappedBy = "genres")
     private Set<Movie> movies = new HashSet<>();
 
-    public Long getId() {
-        return id;
+    public GenreDTO toDTO() {
+        GenreDTO genreDTO = new GenreDTO();
+        genreDTO.setId(this.id);
+        genreDTO.setName(this.name);
+        return genreDTO;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public static Genre fromDTO(GenreDTO genreDTO) {
+        Genre genre = new Genre();
+        genre.setId(genreDTO.getId());
+        genre.setName(genreDTO.getName());
+        return genre;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Set<Movie> getMovies() {
-        return movies;
-    }
-
-    public void setMovies(Set<Movie> movies) {
-        this.movies = movies;
-    }
 }

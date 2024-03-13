@@ -2,6 +2,7 @@ package by.bondarev.dbms.controller;
 
 import by.bondarev.dbms.model.Person;
 import by.bondarev.dbms.service.PersonService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,18 +21,18 @@ public class PersonController {
     }
 
     @GetMapping
-    public List<Person> getAllPersons() {
-        return personService.getAllPersons();
+    public String getAllPersons() throws JsonProcessingException {
+        return personService.getAllPersonsAsJSON();
     }
 
     @GetMapping("/{id}")
-    public Optional<Person> getPersonById(@PathVariable Long id) {
-        return personService.getPersonById(id);
+    public String getPersonById(@PathVariable Long id) throws JsonProcessingException {
+        return personService.getPersonByIdAsJSON(id);
     }
 
     @PostMapping
-    public Person savePerson(@RequestBody Person person) {
-        return personService.createPerson(person);
+    public String savePerson(@RequestBody Person person) throws JsonProcessingException {
+        return personService.createPersonAsJSON(person);
     }
 
     @DeleteMapping("/{id}")
