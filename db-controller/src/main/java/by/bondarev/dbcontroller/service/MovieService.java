@@ -1,50 +1,84 @@
-package by.bondarev.service;
+package by.bondarev.dbcontroller.service;
 
-import by.bondarev.dto.MovieDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import by.bondarev.dbcontroller.dto.MovieDTO;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import okhttp3.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+
+import java.io.IOException;
 
 @Service
 public class MovieService {
 
-    private final RestTemplate restTemplate;
-    private final String databaseServiceUrl = "http://dbms-service:8080"; // URL микросервиса СУБД
-    private final String apiServiceUrl = "http://api-service:8081"; // URL микросервиса API
+    private final OkHttpClient client;
 
-    @Autowired
-    public MovieService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    public MovieService() {
+        this.client = new OkHttpClient();
     }
 
-    public ResponseEntity<?> getMovieInfo(String title) {
-        String databaseApiUrl = databaseServiceUrl + "/movies/" + title;
-        ResponseEntity<MovieDTO> responseFromDatabase = restTemplate.getForEntity(databaseApiUrl, MovieDTO.class);
+    public ResponseEntity<?> getMovieInfoFromDatabase(String title) {
+        String databaseApiUrl = "http://dbms-service:8080/movies/" + title;
+        return sendGetRequest(databaseApiUrl);
+    }
 
-        if (responseFromDatabase.getStatusCode() == HttpStatus.OK && responseFromDatabase.getBody() != null) {
-            return responseFromDatabase;
+    public ResponseEntity<?> getMovieInfoFromApi(String title) {
+        String apiServiceApiUrl = "http://api-service:8081/movie/info?title=" + title;
+        return sendGetRequest(apiServiceApiUrl);
+    }
+
+    public ResponseEntity<?> processApiResponse(MovieDTO movieDTO) {
+        ResponseEntity<?> savedMovieResponse = saveMovie(movieDTO);
+
+        if (savedMovieResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.ok(savedMovieResponse.getBody());
         } else {
-            String apiServiceApiUrl = apiServiceUrl + "/movie/info?title=" + title;
-            ResponseEntity<MovieDTO> responseFromApi = restTemplate.getForEntity(apiServiceApiUrl, MovieDTO.class);
-
-            if (responseFromApi.getStatusCode() == HttpStatus.OK && responseFromApi.getBody() != null) {
-                ResponseEntity<MovieDTO> savedMovieResponse = saveMovie(responseFromApi.getBody());
-
-                if (savedMovieResponse.getStatusCode() == HttpStatus.CREATED) {
-                    return ResponseEntity.ok(savedMovieResponse.getBody());
-                } else {
-                    return new ResponseEntity<>("Error saving movie to database", HttpStatus.INTERNAL_SERVER_ERROR);
-                }
-            } else {
-                return new ResponseEntity<>("Error getting movie info from API", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
+            return ResponseEntity.status(savedMovieResponse.getStatusCode()).body("Error saving movie to database");
         }
     }
 
-    public ResponseEntity<MovieDTO> saveMovie(MovieDTO movieDTO) {
-            String databaseApiUrl = databaseServiceUrl + "/movie";
-        return restTemplate.postForEntity(databaseApiUrl, movieDTO, MovieDTO.class);
+    public ResponseEntity<?> saveMovie(MovieDTO movieDTO) {
+        String databaseApiUrl = "http://dbms-service:8080/movie";
+        return sendPostRequest(databaseApiUrl, movieDTO);
+    }
+
+    private ResponseEntity<?> sendGetRequest(String url) {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        return executeRequest(request);
+    }
+
+    private ResponseEntity<?> sendPostRequest(String url, MovieDTO requestBody) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonBody = objectMapper.writeValueAsString(requestBody);
+
+            RequestBody body = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(body)
+                    .build();
+
+            return executeRequest(request);
+        } catch (JsonProcessingException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private ResponseEntity<?> executeRequest(Request request) {
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful() && response.body() != null) {
+                return new ResponseEntity<>(response.body().string(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
