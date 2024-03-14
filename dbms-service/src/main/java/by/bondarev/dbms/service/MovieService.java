@@ -1,61 +1,71 @@
 package by.bondarev.dbms.service;
 
-import by.bondarev.dbms.dto.MovieDTO;
-import by.bondarev.dbms.dto.PersonDTO;
-import by.bondarev.dbms.model.Country;
-import by.bondarev.dbms.model.Genre;
 import by.bondarev.dbms.model.Movie;
-import by.bondarev.dbms.model.Person;
+import by.bondarev.dbms.dto.MovieDTO;
 import by.bondarev.dbms.repository.MovieRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MovieService {
 
     private final MovieRepository movieRepository;
-    private final GenreService genreService;
-    private final CountryService countryService;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public MovieService(MovieRepository movieRepository, GenreService genreService, CountryService countryService) {
+    public MovieService(MovieRepository movieRepository, ObjectMapper objectMapper) {
         this.movieRepository = movieRepository;
-        this.genreService = genreService;
-        this.countryService = countryService;
+        this.objectMapper = objectMapper;
     }
 
-
-
-    public List<Movie> findMoviesByGenre(String genreName) {
-        return movieRepository.findByGenresName(genreName);
+    public String findMoviesByGenre(String genreName) throws JsonProcessingException {
+        List<Movie> movies = movieRepository.findByGenresName(genreName);
+        List<MovieDTO> movieDTOs = movies.stream().map(Movie::toDTO).collect(Collectors.toList());
+        return objectMapper.writeValueAsString(movieDTOs);
     }
 
-    public List<Movie> findMoviesByCountry(String countryName) {
-        return movieRepository.findByCountriesName(countryName);
+    public String findMoviesByCountry(String countryName) throws JsonProcessingException {
+        List<Movie> movies = movieRepository.findByCountriesName(countryName);
+        List<MovieDTO> movieDTOs = movies.stream().map(Movie::toDTO).collect(Collectors.toList());
+        return objectMapper.writeValueAsString(movieDTOs);
     }
 
-    public List<Movie> findMoviesByPerson(String personName) {
-        return movieRepository.findByPersonName(personName);
+    public String findMoviesByPerson(String personName) throws JsonProcessingException {
+        List<Movie> movies = movieRepository.findByPersonsName(personName);
+        List<MovieDTO> movieDTOs = movies.stream().map(Movie::toDTO).collect(Collectors.toList());
+        return objectMapper.writeValueAsString(movieDTOs);
     }
 
-    public List<Movie> getAllMovies() {
-        return movieRepository.findAll();
+    public String getAllMovies() throws JsonProcessingException {
+        List<Movie> movies = movieRepository.findAllFetchGenresAndPersonsAndCountries();
+        List<MovieDTO> movieDTOs = movies.stream().map(Movie::toDTO).collect(Collectors.toList());
+        return objectMapper.writeValueAsString(movieDTOs);
     }
 
-    public Optional<Movie> getMovieById(Long id) {
-        return movieRepository.findById(id);
-    }
-    public List<Movie> getMovieByTitle(String title) {
-        return movieRepository.findByName(title);
+    public String getMovieById(Long id) throws JsonProcessingException {
+        Optional<Movie> movie = movieRepository.findById(id);
+        return objectMapper.writeValueAsString(movie.map(Movie::toDTO).orElse(null));
     }
 
-    public Movie saveMovie(MovieDTO movieDTO) {
-        return movieRepository.save(Movie.fromDTO(movieDTO));
+    public String getMovieByTitle(String title) throws JsonProcessingException {
+        List<Movie> movies = movieRepository.findByName(title);
+        List<MovieDTO> movieDTOs = movies.stream().map(Movie::toDTO).collect(Collectors.toList());
+        return objectMapper.writeValueAsString(movieDTOs);
     }
 
-    public void deleteMovieById(Long id) {
+    public String saveMovie(MovieDTO movieDTO) throws JsonProcessingException {
+        Movie movie = movieRepository.save(Movie.fromDTO(movieDTO));
+        return objectMapper.writeValueAsString(movie.toDTO());
+    }
+
+    public boolean deleteMovieById(Long id) {
         movieRepository.deleteById(id);
+        return true;
     }
 }

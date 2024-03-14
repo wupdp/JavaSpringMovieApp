@@ -1,17 +1,14 @@
 package by.bondarev.dbms.model;
 
 import by.bondarev.dbms.dto.MovieDTO;
-import by.bondarev.dbms.dto.PersonDTO;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Setter
-@Getter
+@Data
 @Entity
 public class Movie {
     @Id
@@ -24,27 +21,29 @@ public class Movie {
 
     private String type;
 
+    @Column(name = "type_number")
     private int typeNumber;
 
     private String status;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(name = "movie_person",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "person_id"))
     private Set<Person> persons = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(name = "movie_genre",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private Set<Genre> genres = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
     @JoinTable(name = "movie_country",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "country_id"))
     private Set<Country> countries = new HashSet<>();
+
 
     public MovieDTO toDTO() {
         MovieDTO movieDTO = new MovieDTO();

@@ -10,10 +10,11 @@ import java.util.List;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
-    @Query("SELECT m FROM Movie m INNER JOIN m.persons p WHERE p.name = ?1")
-    List<Movie> findByPersonName(String personName);
+    List<Movie> findByPersonsName(String personName);
+
+    @Query("SELECT DISTINCT m FROM Movie m JOIN FETCH m.genres g JOIN FETCH m.persons p JOIN FETCH m.countries c")
+    List<Movie> findAllFetchGenresAndPersonsAndCountries();
     List<Movie> findByName(String name);
     List<Movie> findByGenresName(String genreName);
-
     List<Movie> findByCountriesName(String countryName);
 }

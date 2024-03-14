@@ -3,40 +3,59 @@ package by.bondarev.dbms.controller;
 import by.bondarev.dbms.model.Person;
 import by.bondarev.dbms.service.PersonService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import okhttp3.OkHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/persons")
 public class PersonController {
 
     private final PersonService personService;
+    private final OkHttpClient client;
 
     @Autowired
     public PersonController(PersonService personService) {
         this.personService = personService;
+        this.client = new OkHttpClient();
     }
 
     @GetMapping
-    public String getAllPersons() throws JsonProcessingException {
-        return personService.getAllPersonsAsJSON();
+    public ResponseEntity<String> getAllPersons() throws JsonProcessingException {
+        String response = personService.getAllPersons();
+        if (response == null) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
     @GetMapping("/{id}")
-    public String getPersonById(@PathVariable Long id) throws JsonProcessingException {
-        return personService.getPersonByIdAsJSON(id);
+    public ResponseEntity<String> getPersonById(@PathVariable Long id) throws JsonProcessingException {
+        String response = personService.getPersonById(id);
+        if (response == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
     @PostMapping
-    public String savePerson(@RequestBody Person person) throws JsonProcessingException {
-        return personService.createPersonAsJSON(person);
+    public ResponseEntity<String> savePerson(@RequestBody Person person) throws JsonProcessingException {
+        String response = personService.createPerson(person);
+        if (response == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
     }
 
     @DeleteMapping("/{id}")
-    public void deletePerson(@PathVariable Long id) {
-        personService.deletePersonById(id);
+    public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
+        boolean success = personService.deletePersonById(id);
+        if (!success) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -1,6 +1,7 @@
 package by.bondarev.dbms.service;
 
 import by.bondarev.dbms.model.Person;
+import by.bondarev.dbms.dto.PersonDTO;
 import by.bondarev.dbms.repository.PersonRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PersonService {
@@ -22,29 +24,24 @@ public class PersonService {
         this.objectMapper = objectMapper;
     }
 
-    public String getAllPersonsAsJSON() throws JsonProcessingException {
+    public String getAllPersons() throws JsonProcessingException {
         List<Person> persons = personRepository.findAll();
-        return objectMapper.writeValueAsString(persons);
+        List<PersonDTO> personDTOs = persons.stream().map(Person::toDTO).collect(Collectors.toList());
+        return objectMapper.writeValueAsString(personDTOs);
     }
 
-    public String getPersonByIdAsJSON(Long id) throws JsonProcessingException {
+    public String getPersonById(Long id) throws JsonProcessingException {
         Optional<Person> person = personRepository.findById(id);
-        return person.map(p -> {
-            try {
-                return objectMapper.writeValueAsString(p);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }).orElse(null);
+        return objectMapper.writeValueAsString(person.map(Person::toDTO).orElse(null));
     }
 
-    public String createPersonAsJSON(Person person) throws JsonProcessingException {
+    public String createPerson(Person person) throws JsonProcessingException {
         Person createdPerson = personRepository.save(person);
-        return objectMapper.writeValueAsString(createdPerson);
+        return objectMapper.writeValueAsString(createdPerson.toDTO());
     }
 
-    public void deletePersonById(Long id) {
+    public boolean deletePersonById(Long id) {
         personRepository.deleteById(id);
+        return true;
     }
 }
