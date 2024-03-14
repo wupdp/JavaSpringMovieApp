@@ -2,13 +2,16 @@ package by.bondarev.dbms.model;
 
 import by.bondarev.dbms.dto.MovieDTO;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Movie {
     @Id

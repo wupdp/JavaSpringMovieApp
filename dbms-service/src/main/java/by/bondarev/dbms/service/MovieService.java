@@ -43,7 +43,7 @@ public class MovieService {
     }
 
     public String getAllMovies() throws JsonProcessingException {
-        List<Movie> movies = movieRepository.findAllFetchGenresAndPersonsAndCountries();
+        List<Movie> movies = movieRepository.findAll();
         List<MovieDTO> movieDTOs = movies.stream().map(Movie::toDTO).collect(Collectors.toList());
         return objectMapper.writeValueAsString(movieDTOs);
     }

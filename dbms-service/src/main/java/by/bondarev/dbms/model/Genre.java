@@ -3,12 +3,15 @@ package by.bondarev.dbms.model;
 import by.bondarev.dbms.dto.GenreDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Genre {
     @Id
@@ -17,12 +20,12 @@ public class Genre {
 
     private String name;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "genres", fetch = FetchType.LAZY,
             cascade = {
                     CascadeType.PERSIST,
                     CascadeType.MERGE
             })
-    @JsonIgnore
     private Set<Movie> movies = new HashSet<>();
 
     public GenreDTO toDTO() {

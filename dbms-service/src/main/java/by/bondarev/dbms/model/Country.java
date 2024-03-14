@@ -3,12 +3,15 @@ package by.bondarev.dbms.model;
 import by.bondarev.dbms.dto.CountryDTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Country {
 
@@ -18,12 +21,12 @@ public class Country {
 
     private String name;
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "countries", fetch = FetchType.LAZY,
             cascade = {
                     CascadeType.PERSIST,
                     CascadeType.MERGE
             })
-    @JsonIgnore
     private Set<Movie> movies = new HashSet<>();
 
     public CountryDTO toDTO() {
