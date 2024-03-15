@@ -1,4 +1,4 @@
-package by.bondarev.dbcontroller.dto;
+package by.bondarev.moviesearch.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

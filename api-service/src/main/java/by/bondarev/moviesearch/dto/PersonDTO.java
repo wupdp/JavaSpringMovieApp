@@ -1,4 +1,4 @@
-package by.bondarev.dbcontroller.dto;
+package by.bondarev.moviesearch.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,25 +7,19 @@ import lombok.Data;
 import java.util.Set;
 
 @Data
-public class MovieDTO {
+public class PersonDTO {
     private Long id;
     private String name;
     private String description;
-    private String type;
-    private int typeNumber;
-    private String status;
-    private int statusId;
-    private Set<PersonDTO> persons;
-    private Set<GenreDTO> genres;
-    private Set<CountryDTO> countries;
+    private Set<MovieDTO> movies;
 
     public String toJSON() throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(this);
     }
 
-    public static MovieDTO fromJSON(String json) throws JsonProcessingException {
+    public static PersonDTO fromJSON(String json) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(json, MovieDTO.class);
+        return mapper.readValue(json, PersonDTO.class);
     }
 }
