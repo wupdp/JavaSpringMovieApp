@@ -1,0 +1,7 @@
+FROM postgres:latest
+
+ENV POSTGRES_DB=movieservicebd
+ENV POSTGRES_USER=dbmsuser
+ENV POSTGRES_PASSWORD=191688
+
+EXPOSE 5432
