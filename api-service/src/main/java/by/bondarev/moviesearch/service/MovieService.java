@@ -1,6 +1,9 @@
 package by.bondarev.moviesearch.service;
 
+import by.bondarev.moviesearch.dto.MovieApiResponse;
+import by.bondarev.moviesearch.dto.MovieDTO;
 import by.bondarev.moviesearch.kinopoiskapi.KinopoiskAPI;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -14,9 +17,16 @@ public class MovieService {
     }
 
     public String getMovieInfo(String title) throws IOException {
-        return kinopoiskAPI.searchMovieByName(title);
-        //TODO little json
+        String json = kinopoiskAPI.searchMovieByName(title);
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        MovieApiResponse movieApiResponse = mapper.readValue(json, MovieApiResponse.class);
+        MovieDTO movieDTO = MovieDTO.fromApiResponse(movieApiResponse);
+
+        return movieDTO.toJSON();
     }
+
     public String getRandomAnime() throws IOException {
         return kinopoiskAPI.searchRandomAnime();
     }
