@@ -17,11 +17,13 @@ public class PersonService {
 
     private final PersonRepository personRepository;
     private final ObjectMapper objectMapper;
+    private final EntityIdUpdater entityIdUpdater;
 
     @Autowired
-    public PersonService(PersonRepository personRepository, ObjectMapper objectMapper) {
+    public PersonService(PersonRepository personRepository, ObjectMapper objectMapper, EntityIdUpdater entityIdUpdater) {
         this.personRepository = personRepository;
         this.objectMapper = objectMapper;
+        this.entityIdUpdater = entityIdUpdater;
     }
 
     public String getAllPersons() throws JsonProcessingException {
@@ -35,10 +37,17 @@ public class PersonService {
         return objectMapper.writeValueAsString(person.map(Person::toDTO).orElse(null));
     }
 
-    public String createPerson(Person person) throws JsonProcessingException {
-        Person createdPerson = personRepository.save(person);
-        return objectMapper.writeValueAsString(createdPerson.toDTO());
+    public String savePerson(PersonDTO personDTO) throws JsonProcessingException {
+        Optional<Long> existingIdOptional = personRepository.getIdByName(personDTO.getName());
+        existingIdOptional.ifPresent(personDTO::setId);
+
+        personDTO.setMovies(entityIdUpdater.updateMoviesIds(personDTO.getMovies()));
+
+        Person savedPerson = personRepository.save(Person.fromDTO(personDTO));
+
+        return objectMapper.writeValueAsString(savedPerson.toDTO());
     }
+
 
     public boolean deletePersonById(Long id) {
         personRepository.deleteById(id);

@@ -16,11 +16,13 @@ import java.util.stream.Collectors;
 public class CountryService {
 
     private final CountryRepository countryRepository;
+    private final EntityIdUpdater entityIdUpdater;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public CountryService(CountryRepository countryRepository, ObjectMapper objectMapper) {
+    public CountryService(CountryRepository countryRepository, EntityIdUpdater entityIdUpdater, ObjectMapper objectMapper) {
         this.countryRepository = countryRepository;
+        this.entityIdUpdater = entityIdUpdater;
         this.objectMapper = objectMapper;
     }
 
@@ -35,8 +37,14 @@ public class CountryService {
         return objectMapper.writeValueAsString(country.map(Country::toDTO).orElse(null));
     }
 
-    public String saveCountry(Country country) throws JsonProcessingException {
-        Country savedCountry = countryRepository.save(country);
+    public String saveCountry(CountryDTO countryDTO) throws JsonProcessingException {
+        Optional<Long> existingIdOptional = countryRepository.getIdByName(countryDTO.getName());
+        existingIdOptional.ifPresent(countryDTO::setId);
+
+        countryDTO.setMovies(entityIdUpdater.updateMoviesIds(countryDTO.getMovies()));
+
+        Country savedCountry = countryRepository.save(Country.fromDTO(countryDTO));
+
         return objectMapper.writeValueAsString(savedCountry.toDTO());
     }
 

@@ -16,16 +16,17 @@ import java.util.Set;
 public class Country {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @Column(unique = true)
     private String name;
 
     @JsonIgnore
     @ManyToMany(mappedBy = "countries", fetch = FetchType.LAZY,
             cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
+                    CascadeType.MERGE,
+                    CascadeType.PERSIST
             })
     private Set<Movie> movies = new HashSet<>();
 

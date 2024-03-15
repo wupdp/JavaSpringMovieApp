@@ -1,6 +1,6 @@
 package by.bondarev.dbms.controller;
 
-import by.bondarev.dbms.model.Person;
+import by.bondarev.dbms.dto.PersonDTO;
 import by.bondarev.dbms.service.PersonService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import okhttp3.OkHttpClient;
@@ -42,8 +42,8 @@ public class PersonController {
     }
 
     @PostMapping
-    public ResponseEntity<String> savePerson(@RequestBody Person person) throws JsonProcessingException {
-        String response = personService.createPerson(person);
+    public ResponseEntity<String> savePerson(@RequestBody PersonDTO person) throws JsonProcessingException {
+        String response = personService.savePerson(person);
         if (response == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

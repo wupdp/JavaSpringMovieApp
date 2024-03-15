@@ -14,6 +14,7 @@ public class MovieDTO {
     private String type;
     private int typeNumber;
     private String status;
+    private int statusId;
     private Set<PersonDTO> persons;
     private Set<GenreDTO> genres;
     private Set<CountryDTO> countries;

@@ -18,30 +18,32 @@ public class Movie {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true)
     private String name;
 
     private String description;
 
-    private String type;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+    @JoinColumn(name = "type_id")
+    private Type type;
 
-    @Column(name = "type_number")
-    private int typeNumber;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
+    @JoinColumn(name = "status_id")
+    private Status status;
 
-    private String status;
-
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
     @JoinTable(name = "movie_person",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "person_id"))
     private Set<Person> persons = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
     @JoinTable(name = "movie_genre",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "genre_id"))
     private Set<Genre> genres = new HashSet<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+    @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE,  CascadeType.PERSIST })
     @JoinTable(name = "movie_country",
             joinColumns = @JoinColumn(name = "movie_id"),
             inverseJoinColumns = @JoinColumn(name = "country_id"))
@@ -53,9 +55,10 @@ public class Movie {
         movieDTO.setId(this.id);
         movieDTO.setName(this.name);
         movieDTO.setDescription(this.description);
-        movieDTO.setType(this.type);
-        movieDTO.setTypeNumber(this.typeNumber);
-        movieDTO.setStatus(this.status);
+        movieDTO.setType(this.type.getName());
+        movieDTO.setTypeNumber(this.type.getId());
+        movieDTO.setStatus(this.status.getName());
+        movieDTO.setStatusId(this.status.getId());
         // Преобразование наборов entities в наборы DTO
         movieDTO.setPersons(this.persons.stream().map(Person::toDTO).collect(Collectors.toSet()));
         movieDTO.setGenres(this.genres.stream().map(Genre::toDTO).collect(Collectors.toSet()));
@@ -68,9 +71,18 @@ public class Movie {
         movie.setId(movieDTO.getId());
         movie.setName(movieDTO.getName());
         movie.setDescription(movieDTO.getDescription());
-        movie.setType(movieDTO.getType());
-        movie.setTypeNumber(movieDTO.getTypeNumber());
-        movie.setStatus(movieDTO.getStatus());
+
+        Type type = new Type();
+        type.setId(movieDTO.getTypeNumber());
+        type.setName(movieDTO.getType());
+
+        movie.setType(type);
+
+        Status status = new Status();
+        status.setId(movieDTO.getStatusId());
+        status.setName(movieDTO.getStatus());
+
+        movie.setStatus(status);
         // Преобразование наборов DTO в наборы entities
         movie.setPersons(movieDTO.getPersons().stream().map(Person::fromDTO).collect(Collectors.toSet()));
         movie.setGenres(movieDTO.getGenres().stream().map(Genre::fromDTO).collect(Collectors.toSet()));

@@ -17,11 +17,13 @@ public class MovieService {
 
     private final MovieRepository movieRepository;
     private final ObjectMapper objectMapper;
+    private final EntityIdUpdater entityIdUpdater;
 
     @Autowired
-    public MovieService(MovieRepository movieRepository, ObjectMapper objectMapper) {
+    public MovieService(MovieRepository movieRepository, ObjectMapper objectMapper, EntityIdUpdater entityIdUpdater) {
         this.movieRepository = movieRepository;
         this.objectMapper = objectMapper;
+        this.entityIdUpdater = entityIdUpdater;
     }
 
     public String findMoviesByGenre(String genreName) throws JsonProcessingException {
@@ -60,7 +62,15 @@ public class MovieService {
     }
 
     public String saveMovie(MovieDTO movieDTO) throws JsonProcessingException {
+        Optional<Long> existingMovieIdOptional = movieRepository.getIdByName(movieDTO.getName());
+        existingMovieIdOptional.ifPresent(movieDTO::setId);
+
+        movieDTO.setPersons(entityIdUpdater.updatePersonsIds(movieDTO.getPersons()));
+        movieDTO.setGenres(entityIdUpdater.updateGenresIds(movieDTO.getGenres()));
+        movieDTO.setCountries(entityIdUpdater.updateCountriesIds(movieDTO.getCountries()));
+
         Movie movie = movieRepository.save(Movie.fromDTO(movieDTO));
+
         return objectMapper.writeValueAsString(movie.toDTO());
     }
 

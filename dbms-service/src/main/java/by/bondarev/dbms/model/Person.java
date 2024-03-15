@@ -16,9 +16,10 @@ import java.util.Set;
 public class Person {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @Column(unique = true)
     private String name;
 
     private String description;
@@ -26,8 +27,8 @@ public class Person {
     @JsonIgnore
     @ManyToMany(mappedBy = "persons", fetch = FetchType.LAZY,
             cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
+                    CascadeType.MERGE,
+                    CascadeType.PERSIST
             })
     private Set<Movie> movies = new HashSet<>();
 

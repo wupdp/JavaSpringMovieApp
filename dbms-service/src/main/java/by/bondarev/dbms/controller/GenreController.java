@@ -1,6 +1,6 @@
 package by.bondarev.dbms.controller;
 
-import by.bondarev.dbms.model.Genre;
+import by.bondarev.dbms.dto.GenreDTO;
 import by.bondarev.dbms.service.GenreService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import okhttp3.OkHttpClient;
@@ -42,7 +42,7 @@ public class GenreController {
     }
 
     @PostMapping
-    public ResponseEntity<String> saveGenre(@RequestBody Genre genre) throws JsonProcessingException {
+    public ResponseEntity<String> saveGenre(@RequestBody GenreDTO genre) throws JsonProcessingException {
         String response = genreService.saveGenre(genre);
         if (response == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

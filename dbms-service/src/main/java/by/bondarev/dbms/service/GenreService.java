@@ -16,12 +16,14 @@ import java.util.stream.Collectors;
 public class GenreService {
 
     private final GenreRepository genreRepository;
+    private final EntityIdUpdater entityIdUpdater;
 
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public GenreService(GenreRepository genreRepository, ObjectMapper objectMapper) {
+    public GenreService(GenreRepository genreRepository, EntityIdUpdater entityIdUpdater, ObjectMapper objectMapper) {
         this.genreRepository = genreRepository;
+        this.entityIdUpdater = entityIdUpdater;
         this.objectMapper = objectMapper;
     }
 
@@ -36,8 +38,14 @@ public class GenreService {
         return objectMapper.writeValueAsString(genre.map(Genre::toDTO).orElse(null));
     }
 
-    public String saveGenre(Genre genre) throws JsonProcessingException {
-        Genre savedGenre = genreRepository.save(genre);
+    public String saveGenre(GenreDTO genreDTO) throws JsonProcessingException {
+        Optional<Long> existingIdOptional = genreRepository.getIdByName(genreDTO.getName());
+        existingIdOptional.ifPresent(genreDTO::setId);
+
+        genreDTO.setMovies(entityIdUpdater.updateMoviesIds(genreDTO.getMovies()));
+
+        Genre savedGenre = genreRepository.save(Genre.fromDTO(genreDTO));
+
         return objectMapper.writeValueAsString(savedGenre.toDTO());
     }
 

@@ -1,6 +1,6 @@
 package by.bondarev.dbms.controller;
 
-import by.bondarev.dbms.model.Country;
+import by.bondarev.dbms.dto.CountryDTO;
 import by.bondarev.dbms.service.CountryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import okhttp3.OkHttpClient;
@@ -42,7 +42,8 @@ public class CountryController {
     }
 
     @PostMapping
-    public ResponseEntity<String> saveCountry(@RequestBody Country country) throws JsonProcessingException {
+    public ResponseEntity<String> saveCountry(@RequestBody CountryDTO country) throws JsonProcessingException {
+
         String response = countryService.saveCountry(country);
         if (response == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
