@@ -12,9 +12,9 @@ public class MovieDTO {
     private String name;
     private String description;
     private String type;
-    private int typeNumber;
+    private Long typeNumber;
     private String status;
-    private int statusId;
+    private Long statusId;
     private Set<PersonDTO> persons;
     private Set<GenreDTO> genres;
     private Set<CountryDTO> countries;

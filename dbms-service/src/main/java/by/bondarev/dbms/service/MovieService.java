@@ -68,6 +68,8 @@ public class MovieService {
         movieDTO.setPersons(entityIdUpdater.updatePersonsIds(movieDTO.getPersons()));
         movieDTO.setGenres(entityIdUpdater.updateGenresIds(movieDTO.getGenres()));
         movieDTO.setCountries(entityIdUpdater.updateCountriesIds(movieDTO.getCountries()));
+        movieDTO.setStatusId(entityIdUpdater.updateStatusId(movieDTO.getStatus()));
+        movieDTO.setTypeNumber(entityIdUpdater.updateTypeId(movieDTO.getType()));
 
         Movie movie = movieRepository.save(Movie.fromDTO(movieDTO));
 

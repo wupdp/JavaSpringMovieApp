@@ -4,10 +4,9 @@ import by.bondarev.dbms.dto.CountryDTO;
 import by.bondarev.dbms.dto.GenreDTO;
 import by.bondarev.dbms.dto.MovieDTO;
 import by.bondarev.dbms.dto.PersonDTO;
-import by.bondarev.dbms.repository.CountryRepository;
-import by.bondarev.dbms.repository.GenreRepository;
-import by.bondarev.dbms.repository.MovieRepository;
-import by.bondarev.dbms.repository.PersonRepository;
+import by.bondarev.dbms.model.Status;
+import by.bondarev.dbms.model.Type;
+import by.bondarev.dbms.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -23,13 +22,17 @@ public class EntityIdUpdater {
     private final CountryRepository countryRepository;
 
     private final MovieRepository movieRepository;
+    private final StatusRepository statusRepository;
+    private final TypeRepository typeRepository;
 
     @Autowired
-    public EntityIdUpdater(PersonRepository personRepository, GenreRepository genreRepository, CountryRepository countryRepository, MovieRepository movieRepository) {
+    public EntityIdUpdater(PersonRepository personRepository, GenreRepository genreRepository, CountryRepository countryRepository, MovieRepository movieRepository, TypeRepository typeRepository, StatusRepository statusRepository) {
         this.personRepository = personRepository;
         this.genreRepository = genreRepository;
         this.countryRepository = countryRepository;
         this.movieRepository = movieRepository;
+        this.statusRepository = statusRepository;
+        this.typeRepository = typeRepository;
     }
 
     public Set<PersonDTO> updatePersonsIds(Set<PersonDTO> personDTOSet) {
@@ -80,5 +83,18 @@ public class EntityIdUpdater {
         return updatedMovieDTOSet;
     }
 
+    public Long updateTypeId(String typeName) {
+        if (typeName == null) return null;
+
+        Optional<Long> existingTypeIdOptional = typeRepository.getIdByName(typeName);
+        return existingTypeIdOptional.orElse(null);
+    }
+
+    public Long updateStatusId(String statusName) {
+        if (statusName == null) return null;
+
+        Optional<Long> existingStatusIdOptional = statusRepository.getIdByName(statusName);
+        return existingStatusIdOptional.orElse(null);
+    }
 
 }
