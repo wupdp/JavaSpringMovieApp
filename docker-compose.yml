@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db-container:
+    image: postgres:latest
+    container_name: db-container
+    restart: always
+    networks:
+      - movies-network
+    environment:
+      POSTGRES_USER: dbmsuser
+      POSTGRES_PASSWORD: 191688
+      POSTGRES_DB: movieservicebd
+    volumes:
+      - /home/wupdp/data:/var/lib/postgresql/data
+
+  dbms-service:
+    build: ./dbms-service
+    image: dbms-service:latest
+    container_name: dbms-service
+    restart: always
+    networks:
+      - movies-network
+    depends_on:
+    - db-container
+    environment:
+      DATABASE_URL: db-container:5432
+
+  api-service:
+    build: ./api-service
+    image: api-service:latest
+    container_name: api-service
+    restart: always
+    networks:
+      - movies-network
+
+  db-controller:
+    build: ./db-controller
+    image: db-controller
+    container_name: db-controller
+    restart: always
+    networks:
+      - movies-network
+    ports:
+      - "8081:8081"
+
+networks:
+  movies-network:
+    driver: bridge

@@ -4,6 +4,7 @@ import by.bondarev.dbcontroller.dto.MovieDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,17 +16,23 @@ public class MovieService {
 
     private final OkHttpClient client;
 
+    @Value("${dbms.url}")
+    private String dbmsUrl;
+
+    @Value("${api.url}")
+    private String apiUrl;
+
     public MovieService() {
         this.client = new OkHttpClient();
     }
 
     public ResponseEntity<String> getMovieInfoFromDatabase(String requestPath) {
-        String databaseApiUrl = "http://localhost:8080/" + requestPath;
+        String databaseApiUrl = dbmsUrl + requestPath;
         return sendGetRequest(databaseApiUrl);
     }
 
     public ResponseEntity<String> getMovieInfoFromApi(String title) throws JsonProcessingException {
-        String apiServiceApiUrl = "http://localhost:8081/movie/info?title=" + title;
+        String apiServiceApiUrl = apiUrl + "movie/info?title=" + title;
         ResponseEntity<String> json = sendGetRequest(apiServiceApiUrl);
 
         return ResponseEntity.ok(json.getBody());
@@ -42,7 +49,7 @@ public class MovieService {
     }
 
     public ResponseEntity<String> saveMovie(String movieDTO) {
-        String databaseApiUrl = "http://localhost:8080/movies";
+        String databaseApiUrl = dbmsUrl + "movies";
         return sendPostRequest(databaseApiUrl, movieDTO);
     }
 
