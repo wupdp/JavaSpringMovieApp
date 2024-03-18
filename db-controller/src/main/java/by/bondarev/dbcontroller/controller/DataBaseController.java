@@ -58,6 +58,16 @@ public class DataBaseController {
                         .getBody());
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<String> getAllMovies() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(movieService
+                        .getMovieInfoFromDatabase("movies")
+                        .getBody());
+    }
+
     @GetMapping("/byGenre")
     public ResponseEntity<String> getMoviesByGenre(@RequestParam("genre") String genre) {
         return ResponseEntity
