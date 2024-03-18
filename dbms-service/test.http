@@ -1,7 +1,22 @@
 ###test movie
 GET http://localhost:8080/movies
 
+###
+POST http://localhost:8080/movies
+Content-Type: application/json
 
+{
+  "id": 0,
+  "name": "TEST",
+  "description": "TEST",
+  "type": "TEST",
+  "typeNumber": 0,
+  "status": "TEST",
+  "statusId": 0,
+  "persons": [],
+  "genres": [],
+  "countries": []
+}
 
 ###
 GET http://localhost:8080/movies/byCountry/TEST
@@ -19,7 +34,7 @@ GET http://localhost:8080/movies/byTitle/Avengers
 GET http://localhost:8080/movies/2
 
 ###
-DELETE http://localhost:8080/movies/1
+DELETE http://localhost:8080/movies/{id}
 
 ###
 GET http://localhost:8080/persons

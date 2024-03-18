@@ -21,6 +21,7 @@ public class Movie {
     @Column(unique = true)
     private String name;
 
+    @Column(length = 6000)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })

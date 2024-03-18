@@ -4,6 +4,7 @@ import by.bondarev.dbcontroller.dto.MovieDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import okhttp3.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,36 +16,44 @@ public class MovieService {
 
     private final OkHttpClient client;
 
+    @Value("${dbms.url}")
+    private String dbmsUrl;
+
+    @Value("${api.url}")
+    private String apiUrl;
+
     public MovieService() {
         this.client = new OkHttpClient();
     }
 
-    public ResponseEntity<?> getMovieInfoFromDatabase(String title) {
-        String databaseApiUrl = "http://dbms-service:8080/movies/" + title;
+    public ResponseEntity<String> getMovieInfoFromDatabase(String requestPath) {
+        String databaseApiUrl = dbmsUrl + requestPath;
         return sendGetRequest(databaseApiUrl);
     }
 
-    public ResponseEntity<?> getMovieInfoFromApi(String title) {
-        String apiServiceApiUrl = "http://api-service:8081/movie/info?title=" + title;
-        return sendGetRequest(apiServiceApiUrl);
+    public ResponseEntity<String> getMovieInfoFromApi(String title) throws JsonProcessingException {
+        String apiServiceApiUrl = apiUrl + "movie/info?title=" + title;
+        ResponseEntity<String> json = sendGetRequest(apiServiceApiUrl);
+
+        return ResponseEntity.ok(json.getBody());
     }
 
-    public ResponseEntity<?> processApiResponse(MovieDTO movieDTO) {
-        ResponseEntity<?> savedMovieResponse = saveMovie(movieDTO);
+    public ResponseEntity<String> processApiResponse(String movieDTO) {
+        ResponseEntity<String> savedMovieResponse = saveMovie(movieDTO);
 
         if (savedMovieResponse.getStatusCode().is2xxSuccessful()) {
             return ResponseEntity.ok(savedMovieResponse.getBody());
         } else {
-            return ResponseEntity.status(savedMovieResponse.getStatusCode()).body("Error saving movie to database");
+            return ResponseEntity.status(savedMovieResponse.getStatusCode()).body("Errorrr saving movie to database");
         }
     }
 
-    public ResponseEntity<?> saveMovie(MovieDTO movieDTO) {
-        String databaseApiUrl = "http://dbms-service:8080/movie";
+    public ResponseEntity<String> saveMovie(String movieDTO) {
+        String databaseApiUrl = dbmsUrl + "movies";
         return sendPostRequest(databaseApiUrl, movieDTO);
     }
 
-    private ResponseEntity<?> sendGetRequest(String url) {
+    private ResponseEntity<String> sendGetRequest(String url) {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -52,25 +61,18 @@ public class MovieService {
         return executeRequest(request);
     }
 
-    private ResponseEntity<?> sendPostRequest(String url, MovieDTO requestBody) {
-        try {
-            ObjectMapper objectMapper = new ObjectMapper();
-            String jsonBody = objectMapper.writeValueAsString(requestBody);
+    private ResponseEntity<String> sendPostRequest(String url, String requestBody) {
+        RequestBody body = RequestBody.create(requestBody, MediaType.parse("application/json"));
 
-            RequestBody body = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
 
-            Request request = new Request.Builder()
-                    .url(url)
-                    .post(body)
-                    .build();
-
-            return executeRequest(request);
-        } catch (JsonProcessingException e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        return executeRequest(request);
     }
 
-    private ResponseEntity<?> executeRequest(Request request) {
+    private ResponseEntity<String> executeRequest(Request request) {
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful() && response.body() != null) {
                 return new ResponseEntity<>(response.body().string(), HttpStatus.OK);

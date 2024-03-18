@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/movies")
 public class MovieController {
@@ -44,7 +46,7 @@ public class MovieController {
     @GetMapping("/byTitle/{title}")
     public ResponseEntity<String> getMovieByTitle(@PathVariable String title) throws JsonProcessingException {
         String response = movieService.getMovieByTitle(title);
-        if (response == null) {
+        if (Objects.equals(response, "[]")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
         return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(response);
