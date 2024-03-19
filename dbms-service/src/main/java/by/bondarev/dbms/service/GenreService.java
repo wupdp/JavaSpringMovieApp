@@ -3,6 +3,7 @@ package by.bondarev.dbms.service;
 import by.bondarev.dbms.dto.GenreDTO;
 import by.bondarev.dbms.model.Genre;
 import by.bondarev.dbms.repository.GenreRepository;
+import by.bondarev.dbms.service.cache.GenreCache;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,15 @@ public class GenreService {
     private final GenreRepository genreRepository;
     private final EntityIdUpdater entityIdUpdater;
 
+    private final GenreCache genreCache;
     private final ObjectMapper objectMapper;
 
     @Autowired
-    public GenreService(GenreRepository genreRepository, EntityIdUpdater entityIdUpdater, ObjectMapper objectMapper) {
+    public GenreService(GenreRepository genreRepository, EntityIdUpdater entityIdUpdater, ObjectMapper objectMapper, GenreCache genreCache) {
         this.genreRepository = genreRepository;
         this.entityIdUpdater = entityIdUpdater;
         this.objectMapper = objectMapper;
+        this.genreCache = genreCache;
     }
 
     public String getAllGenres() throws JsonProcessingException {
@@ -34,8 +37,17 @@ public class GenreService {
     }
 
     public String getGenreById(Long id) throws JsonProcessingException {
+        GenreDTO cachedGenre = genreCache.get(id);
+        if (cachedGenre != null) {
+            return objectMapper.writeValueAsString(cachedGenre);
+        }
+
         Optional<Genre> genre = genreRepository.findById(id);
-        return objectMapper.writeValueAsString(genre.map(Genre::toDTO).orElse(null));
+        return objectMapper.writeValueAsString(genre.map(genreEntity -> {
+            GenreDTO genreDTO = genreEntity.toDTO();
+            genreCache.put(id, genreDTO); // Добавляем в кэш
+            return genreDTO;
+        }).orElse(null));
     }
 
     public String saveGenre(GenreDTO genreDTO) throws JsonProcessingException {
@@ -46,11 +58,13 @@ public class GenreService {
 
         Genre savedGenre = genreRepository.save(Genre.fromDTO(genreDTO));
 
+        genreCache.put(savedGenre.getId(), savedGenre.toDTO());
         return objectMapper.writeValueAsString(savedGenre.toDTO());
     }
 
     public boolean deleteGenreById(Long id) {
         genreRepository.deleteById(id);
+        genreCache.evict(id);
         return true;
     }
 }

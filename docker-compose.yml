@@ -1,6 +1,14 @@
 version: '3.8'
 
 services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    networks:
+      - movies-network
+    environment:
+     - REDIS_PASSWORD=191688
   db-container:
     image: postgres:latest
     container_name: db-container
@@ -23,6 +31,7 @@ services:
       - movies-network
     depends_on:
     - db-container
+    - redis
     environment:
       DATABASE_URL: db-container:5432
 

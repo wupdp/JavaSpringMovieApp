@@ -3,6 +3,8 @@ package by.bondarev.dbms.service;
 import by.bondarev.dbms.model.Movie;
 import by.bondarev.dbms.dto.MovieDTO;
 import by.bondarev.dbms.repository.MovieRepository;
+import by.bondarev.dbms.service.cache.MovieCache;
+import by.bondarev.dbms.service.cache.RedisCache;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,47 +21,93 @@ public class MovieService {
     private final MovieRepository movieRepository;
     private final ObjectMapper objectMapper;
     private final EntityIdUpdater entityIdUpdater;
+    private final RedisCache redisCache;
 
     @Autowired
-    public MovieService(MovieRepository movieRepository, ObjectMapper objectMapper, EntityIdUpdater entityIdUpdater) {
+    public MovieService(MovieRepository movieRepository, ObjectMapper objectMapper, EntityIdUpdater entityIdUpdater, RedisCache redisCache) {
         this.movieRepository = movieRepository;
         this.objectMapper = objectMapper;
         this.entityIdUpdater = entityIdUpdater;
+        this.redisCache = redisCache;
     }
 
     public String findMoviesByGenre(String genreName) throws JsonProcessingException {
+        String cachedMovies = (String) redisCache.get(genreName);
+        if (cachedMovies != null) {
+            return cachedMovies;
+        }
+
         List<Movie> movies = movieRepository.findByGenresName(genreName);
         List<MovieDTO> movieDTOs = movies.stream().map(Movie::toDTO).collect(Collectors.toList());
-        return objectMapper.writeValueAsString(movieDTOs);
+        String result = objectMapper.writeValueAsString(movieDTOs);
+        redisCache.put(genreName, result, 1, TimeUnit.MINUTES);
+        return result;
     }
 
     public String findMoviesByCountry(String countryName) throws JsonProcessingException {
+        String cachedMovies = (String) redisCache.get(countryName);
+        if (cachedMovies != null) {
+            return cachedMovies;
+        }
+
         List<Movie> movies = movieRepository.findByCountriesName(countryName);
         List<MovieDTO> movieDTOs = movies.stream().map(Movie::toDTO).collect(Collectors.toList());
-        return objectMapper.writeValueAsString(movieDTOs);
+        String result = objectMapper.writeValueAsString(movieDTOs);
+        redisCache.put(countryName, result, 1, TimeUnit.MINUTES);
+        return result;
     }
 
     public String findMoviesByPerson(String personName) throws JsonProcessingException {
+        String cachedMovies = (String) redisCache.get(personName);
+        if (cachedMovies != null) {
+            return cachedMovies;
+        }
+
         List<Movie> movies = movieRepository.findByPersonsName(personName);
         List<MovieDTO> movieDTOs = movies.stream().map(Movie::toDTO).collect(Collectors.toList());
-        return objectMapper.writeValueAsString(movieDTOs);
+        String result = objectMapper.writeValueAsString(movieDTOs);
+        redisCache.put(personName, result, 1, TimeUnit.MINUTES);
+        return result;
     }
 
     public String getAllMovies() throws JsonProcessingException {
+        String cachedMovies = (String) redisCache.get("allMovies");
+        if (cachedMovies != null) {
+            return cachedMovies;
+        }
+
         List<Movie> movies = movieRepository.findAll();
         List<MovieDTO> movieDTOs = movies.stream().map(Movie::toDTO).collect(Collectors.toList());
-        return objectMapper.writeValueAsString(movieDTOs);
+        String result = objectMapper.writeValueAsString(movieDTOs);
+        redisCache.put("allMovies", result, 1, TimeUnit.MINUTES);
+        return result;
     }
 
     public String getMovieById(Long id) throws JsonProcessingException {
+        String cachedMovie = (String) redisCache.get("movie_" + id);
+        if (cachedMovie != null) {
+            return cachedMovie;
+        }
+
         Optional<Movie> movie = movieRepository.findById(id);
-        return objectMapper.writeValueAsString(movie.map(Movie::toDTO).orElse(null));
+        String result = objectMapper.writeValueAsString(movie.map(Movie::toDTO).orElse(null));
+        if (result != null) {
+            redisCache.put("movie_" + id, result, 1, TimeUnit.MINUTES);
+        }
+        return result;
     }
 
     public String getMovieByTitle(String title) throws JsonProcessingException {
+        String cachedMovies = (String) redisCache.get("movie_" + title);
+        if (cachedMovies != null) {
+            return cachedMovies;
+        }
+
         List<Movie> movies = movieRepository.findByName(title);
         List<MovieDTO> movieDTOs = movies.stream().map(Movie::toDTO).collect(Collectors.toList());
-        return objectMapper.writeValueAsString(movieDTOs);
+        String result = objectMapper.writeValueAsString(movieDTOs);
+        redisCache.put("movie_" + title, result, 1, TimeUnit.MINUTES);
+        return result;
     }
 
     public String saveMovie(MovieDTO movieDTO) throws JsonProcessingException {
@@ -73,11 +122,16 @@ public class MovieService {
 
         Movie movie = movieRepository.save(Movie.fromDTO(movieDTO));
 
-        return objectMapper.writeValueAsString(movie.toDTO());
+        String result = objectMapper.writeValueAsString(movie.toDTO());
+        if (result != null) {
+            redisCache.put("movie_" + movie.getId(), result, 1, TimeUnit.MINUTES);
+        }
+        return result;
     }
 
     public boolean deleteMovieById(Long id) {
         movieRepository.deleteById(id);
+        redisCache.delete("movie_" + id);
         return true;
     }
 }

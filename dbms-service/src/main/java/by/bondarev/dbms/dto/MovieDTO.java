@@ -3,10 +3,12 @@ package by.bondarev.dbms.dto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.util.Set;
 
 @Data
+@RedisHash("Movie")
 public class MovieDTO {
     private Long id;
     private String name;
