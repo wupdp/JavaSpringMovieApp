@@ -13,9 +13,9 @@ public class MovieDTO {
     private String name;
     private String description;
     private String type;
-    private int typeNumber;
+    private Long typeNumber;
     private String status;
-    private int statusId;
+    private Long statusId;
     private Set<PersonDTO> persons;
     private Set<GenreDTO> genres;
     private Set<CountryDTO> countries;
@@ -28,9 +28,9 @@ public class MovieDTO {
         movieDTO.setName(movieInfo.getName());
         movieDTO.setDescription(movieInfo.getDescription());
         movieDTO.setType(movieInfo.getType());
-        movieDTO.setTypeNumber(movieInfo.getTypeId());
+        movieDTO.setTypeNumber(0L);
         movieDTO.setStatus(movieInfo.getStatus());
-        movieDTO.setStatusId(0);
+        movieDTO.setStatusId(0L);
         movieDTO.setGenres(new HashSet<>(movieInfo.getGenres()));
         movieDTO.setCountries(new HashSet<>(movieInfo.getCountries()));
         return movieDTO;

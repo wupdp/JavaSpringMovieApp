@@ -4,8 +4,6 @@ import by.bondarev.dbms.dto.CountryDTO;
 import by.bondarev.dbms.dto.GenreDTO;
 import by.bondarev.dbms.dto.MovieDTO;
 import by.bondarev.dbms.dto.PersonDTO;
-import by.bondarev.dbms.model.Status;
-import by.bondarev.dbms.model.Type;
 import by.bondarev.dbms.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

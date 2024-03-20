@@ -1,12 +1,13 @@
 package by.bondarev.dbms.service;
 
-import by.bondarev.dbms.model.Movie;
 import by.bondarev.dbms.dto.MovieDTO;
+import by.bondarev.dbms.model.Movie;
 import by.bondarev.dbms.repository.MovieRepository;
-import by.bondarev.dbms.service.cache.MovieCache;
 import by.bondarev.dbms.service.cache.RedisCache;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,7 @@ public class MovieService {
     private final ObjectMapper objectMapper;
     private final EntityIdUpdater entityIdUpdater;
     private final RedisCache redisCache;
+    private static final Logger logger = LoggerFactory.getLogger(MovieService.class);
 
     @Autowired
     public MovieService(MovieRepository movieRepository, ObjectMapper objectMapper, EntityIdUpdater entityIdUpdater, RedisCache redisCache) {
@@ -34,6 +36,7 @@ public class MovieService {
     public String findMoviesByGenre(String genreName) throws JsonProcessingException {
         String cachedMovies = (String) redisCache.get(genreName);
         if (cachedMovies != null) {
+            logger.info("Retrieved movies from cache by genre: {}", genreName);
             return cachedMovies;
         }
 
@@ -47,6 +50,7 @@ public class MovieService {
     public String findMoviesByCountry(String countryName) throws JsonProcessingException {
         String cachedMovies = (String) redisCache.get(countryName);
         if (cachedMovies != null) {
+            logger.info("Retrieved movies from cache by country: {}", countryName);
             return cachedMovies;
         }
 
@@ -60,6 +64,7 @@ public class MovieService {
     public String findMoviesByPerson(String personName) throws JsonProcessingException {
         String cachedMovies = (String) redisCache.get(personName);
         if (cachedMovies != null) {
+            logger.info("Retrieved movies from cache by person: {}", personName);
             return cachedMovies;
         }
 
@@ -73,6 +78,7 @@ public class MovieService {
     public String getAllMovies() throws JsonProcessingException {
         String cachedMovies = (String) redisCache.get("allMovies");
         if (cachedMovies != null) {
+            logger.info("Retrieved all movies from cache");
             return cachedMovies;
         }
 
@@ -86,6 +92,7 @@ public class MovieService {
     public String getMovieById(Long id) throws JsonProcessingException {
         String cachedMovie = (String) redisCache.get("movie_" + id);
         if (cachedMovie != null) {
+            logger.info("Retrieved movie from cache by id: {}", id);
             return cachedMovie;
         }
 
@@ -100,6 +107,7 @@ public class MovieService {
     public String getMovieByTitle(String title) throws JsonProcessingException {
         String cachedMovies = (String) redisCache.get("movie_" + title);
         if (cachedMovies != null) {
+            logger.info("Retrieved movie from cache by title: {}", title);
             return cachedMovies;
         }
 

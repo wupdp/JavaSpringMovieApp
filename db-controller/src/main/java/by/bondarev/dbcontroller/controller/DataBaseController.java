@@ -1,7 +1,6 @@
 package by.bondarev.dbcontroller.controller;
 
 import by.bondarev.dbcontroller.service.MovieService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,7 @@ public class DataBaseController {
     }
 
     @GetMapping("/info")
-    public ResponseEntity<String> getMovieInfo(@RequestParam("title") String title) throws JsonProcessingException {
+    public ResponseEntity<String> getMovieInfo(@RequestParam("title") String title) {
         ResponseEntity<String> responseFromDatabase = movieService.getMovieInfoFromDatabase("movies/byTitle/" + title);
 
         if (responseFromDatabase.getStatusCode().is2xxSuccessful()
@@ -37,12 +36,11 @@ public class DataBaseController {
                 return ResponseEntity
                         .status(HttpStatus.OK)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(responseFromApi
+                        .body(response
                                 .getBody());
             } else {
                 return ResponseEntity
-                        .status(responseFromApi
-                                .getStatusCode())
+                        .status(HttpStatus.BAD_REQUEST)
                         .body("Error getting movie info from API");
             }
         }
@@ -50,61 +48,38 @@ public class DataBaseController {
 
     @GetMapping("/byCountry")
     public ResponseEntity<String> getMoviesByCountry(@RequestParam("country") String country) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(movieService
-                        .getMovieInfoFromDatabase("movies/byCountry/" + country)
-                        .getBody());
+
+        ResponseEntity<String> movies = movieService.getMovieInfoFromDatabase("movies/byCountry/" + country);
+        return ResponseEntity.status(movies.getStatusCode()).contentType(MediaType.APPLICATION_JSON).body(movies.getBody());
     }
 
     @GetMapping("/all")
     public ResponseEntity<String> getAllMovies() {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(movieService
-                        .getMovieInfoFromDatabase("movies")
-                        .getBody());
+        ResponseEntity<String> movies = movieService.getMovieInfoFromDatabase("movies");
+        return ResponseEntity.status(movies.getStatusCode()).contentType(MediaType.APPLICATION_JSON).body(movies.getBody());
     }
 
     @GetMapping("/byGenre")
     public ResponseEntity<String> getMoviesByGenre(@RequestParam("genre") String genre) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(movieService
-                        .getMovieInfoFromDatabase("movies/byGenre/" + genre)
-                        .getBody());
+        ResponseEntity<String> movies = movieService.getMovieInfoFromDatabase("movies/byGenre/" + genre);
+        return ResponseEntity.status(movies.getStatusCode()).contentType(MediaType.APPLICATION_JSON).body(movies.getBody());
     }
 
     @GetMapping("/byPerson")
     public ResponseEntity<String> getMoviesByPerson(@RequestParam("person") String person) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(movieService
-                        .getMovieInfoFromDatabase("movies/byPerson/" + person)
-                        .getBody());
+        ResponseEntity<String> movies = movieService.getMovieInfoFromDatabase("movies/byPerson/" + person);
+        return ResponseEntity.status(movies.getStatusCode()).contentType(MediaType.APPLICATION_JSON).body(movies.getBody());
     }
 
     @GetMapping("/byTitle")
     public ResponseEntity<String> getMovieByTitle(@RequestParam("title") String title) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(movieService
-                        .getMovieInfoFromDatabase("movies/byTitle/" + title)
-                        .getBody());
+        ResponseEntity<String> movies = movieService.getMovieInfoFromDatabase("movies/byTitle/" + title);
+        return ResponseEntity.status(movies.getStatusCode()).contentType(MediaType.APPLICATION_JSON).body(movies.getBody());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<String> getMovieById(@PathVariable Long id) {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(movieService
-                        .getMovieInfoFromDatabase("movies/" + id)
-                        .getBody());
+        ResponseEntity<String> movies = movieService.getMovieInfoFromDatabase("movies/byId/" + id);
+        return ResponseEntity.status(movies.getStatusCode()).contentType(MediaType.APPLICATION_JSON).body(movies.getBody());
     }
 }
