@@ -1,20 +1,20 @@
 package by.bondarev.dbcontroller.config;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import springfox.documentation.builders.RequestHandlerSelectors;
-import springfox.documentation.spi.DocumentationType;
-import springfox.documentation.spring.web.plugins.Docket;
-import springfox.documentation.swagger2.annotations.EnableSwagger2;
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
+import io.swagger.v3.oas.annotations.info.Contact;
+import io.swagger.v3.oas.annotations.info.Info;
 
-@Configuration
-@EnableSwagger2
+@OpenAPIDefinition(
+        info = @Info(
+                title = "Movies Info Api",
+                description = "A movie information storage system synchronized with the Kinopoisk API, imdb API and other platforms", version = "2.0.3",
+                contact = @Contact(
+                        name = "Bondarev Kirill",
+                        email = "kirillbond2017@gmail.com",
+                        url = "https://t.me/wupdp"
+                )
+        )
+)
 public class SwaggerConfig {
-    @Bean
-    public Docket api() {
-        return new Docket(DocumentationType.SWAGGER_2)
-                .select()
-                .apis(RequestHandlerSelectors.basePackage("by.bondarev,dbcontroller"))
-                .build();
-    }
+
 }
