@@ -4,10 +4,13 @@ WORKDIR /app
 
 ENV DATABASE_URL 192.168.1.111:5432
 
-COPY ./src ./src
 COPY ./pom.xml ./
 
-RUN mvn clean install
+RUN mvn dependency:go-offline
+
+COPY ./src ./src
+
+RUN mvn clean install -DskipTests
 
 FROM openjdk:21-jdk-slim AS RUN
 

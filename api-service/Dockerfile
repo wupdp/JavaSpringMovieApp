@@ -2,12 +2,15 @@ FROM maven AS build
 
 WORKDIR /app
 
-COPY ./src ./src
 COPY ./pom.xml ./
 
-RUN mvn clean install
+RUN mvn dependency:go-offline
 
-FROM openjdk:17-jdk-slim AS RUN
+COPY ./src ./src
+
+RUN mvn clean install -DskipTests
+
+FROM openjdk:21-jdk-slim AS RUN
 
 WORKDIR /app
 

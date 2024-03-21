@@ -20,7 +20,7 @@
         <Logger name="com.mkyong" level="debug" additivity="false">
             <AppenderRef ref="LogToRollingFile"/>
         </Logger>
-        <Root level="info">
+        <Root level="warn">
             <AppenderRef ref="LogToConsole"/>
             <AppenderRef ref="LogToRollingFile"/>
         </Root>
