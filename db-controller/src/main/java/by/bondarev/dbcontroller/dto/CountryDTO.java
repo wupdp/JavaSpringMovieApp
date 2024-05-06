@@ -2,9 +2,10 @@ package by.bondarev.dbcontroller.dto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 
 import java.util.Set;
+
+import lombok.Data;
 
 @Data
 public class CountryDTO {
@@ -17,7 +18,8 @@ public class CountryDTO {
         return mapper.writeValueAsString(this);
     }
 
-    public static CountryDTO fromJSON(String json) throws JsonProcessingException {
+    public static CountryDTO fromJSON(String json)
+            throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CountryDTO.class);
     }

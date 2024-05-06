@@ -1,0 +1,48 @@
+<!DOCTYPE module PUBLIC
+        "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+<module name="Checker">
+    <module name="TreeWalker">
+        <!-- Проверка избегания импорта всех классов через * -->
+        <module name="AvoidStarImport">
+            <property name="severity" value="warning" />
+        </module>
+        <!-- Проверка пробелов вокруг операторов -->
+        <module name="WhitespaceAround">
+            <property name="severity" value="warning" />
+        </module>
+        <!-- Проверка отсутствия пустых блоков -->
+        <module name="EmptyBlock">
+            <property name="option" value="TEXT" />
+            <property name="tokens" value="LITERAL_TRY, LITERAL_CATCH, LITERAL_FINALLY, LITERAL_IF, LITERAL_ELSE" />
+            <property name="severity" value="warning" />
+        </module>
+        <!-- Проверка отсутствия пустых строк после открывающей и перед закрывающей скобками -->
+        <module name="EmptyForInitializerPad">
+            <property name="option" value="space" />
+            <property name="tokens" value="FOR_INIT" />
+            <property name="severity" value="warning" />
+        </module>
+        <!-- Проверка отступов -->
+        <module name="Indentation">
+            <property name="severity" value="warning" />
+            <property name="basicOffset" value="4" />
+            <property name="braceAdjustment" value="0" />
+            <property name="caseIndent" value="4" />
+            <property name="throwsIndent" value="4" />
+            <property name="lineWrappingIndentation" value="4" />
+        </module>
+        <!-- Проверка переноса строки -->
+        <module name="MethodParamPad">
+            <property name="severity" value="warning" />
+        </module>
+        <!-- Проверка порядка импортов -->
+        <module name="RedundantImport">
+            <property name="severity" value="warning" />
+        </module>
+        <!-- Проверка использования абсолютных импортов -->
+        <module name="AvoidStaticImport">
+            <property name="severity" value="warning" />
+        </module>
+    </module>
+</module>

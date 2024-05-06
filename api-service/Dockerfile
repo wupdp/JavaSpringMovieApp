@@ -4,11 +4,11 @@ WORKDIR /app
 
 COPY ./pom.xml ./
 
-RUN mvn dependency:go-offline
+RUN mvn dependency:go-offline -DexcludeArtifactIds=maven-checkstyle-plugin
 
 COPY ./src ./src
 
-RUN mvn clean install -DskipTests
+RUN mvn clean install -DskipTests -Pdocker
 
 FROM openjdk:21-jdk-slim AS RUN
 

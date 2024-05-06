@@ -1,6 +1,10 @@
 package by.bondarev.dbcontroller.service;
 
-import okhttp3.*;
+import okhttp3.Response;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.OkHttpClient;
+import okhttp3.MediaType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +20,7 @@ public class MovieService {
     private static final Logger logger = LogManager.getLogger(MovieService.class);
 
     private final OkHttpClient client;
+    private final RequestCounterService requestCounterService;
 
     @Value("${dbms.url}")
     private String dbmsUrl;
@@ -23,16 +28,18 @@ public class MovieService {
     @Value("${api.url}")
     private String apiUrl;
 
-    public MovieService() {
+    public MovieService(RequestCounterService requestCounterService) {
         this.client = new OkHttpClient();
+        this.requestCounterService = requestCounterService;
     }
 
     public ResponseEntity<String> getMovieInfoFromDatabase(String requestPath) {
+        requestCounterService.incrementRequestCounter();
         String databaseApiUrl = dbmsUrl + requestPath;
         return sendGetRequest(databaseApiUrl);
     }
 
-    public ResponseEntity<String> getMovieInfoFromApi(String title)  {
+    public ResponseEntity<String> getMovieInfoFromApi(String title) {
         String apiServiceApiUrl = apiUrl + "movie/info?title=" + title;
         ResponseEntity<String> json = sendGetRequest(apiServiceApiUrl);
 

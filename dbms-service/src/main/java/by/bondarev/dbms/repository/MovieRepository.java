@@ -17,4 +17,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<Movie> findByName(String name);
     List<Movie> findByGenresName(String genreName);
     List<Movie> findByCountriesName(String countryName);
+    boolean existsByName(String name);
 }

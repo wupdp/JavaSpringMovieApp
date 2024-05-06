@@ -3,15 +3,15 @@ version: '3.8'
 services:
   redis:
     image: redis:latest
-    container_name: redis
     restart: always
     networks:
       - movies-network
     environment:
-     - REDIS_PASSWORD=191688
+      - REDIS_PASSWORD=191688
+    ports:
+      - "6379:6379"
   db-container:
     image: postgres:latest
-    container_name: db-container
     restart: always
     networks:
       - movies-network
@@ -27,22 +27,22 @@ services:
   dbms-service:
     build: ./dbms-service
     image: dbms-service:latest
-    container_name: dbms-service
     restart: always
     networks:
       - movies-network
     depends_on:
-    - db-container
-    - redis
+      - db-container
+      - redis
     environment:
       DATABASE_URL: db-container:5432
     volumes:
       - /home/wupdp/logs/dbms:/app/logs
+    ports:
+      - "8080:8080"
 
   api-service:
     build: ./api-service
     image: api-service:latest
-    container_name: api-service
     restart: always
     networks:
       - movies-network
@@ -53,8 +53,10 @@ services:
   db-controller:
     build: ./db-controller
     image: db-controller
-    container_name: db-controller
     restart: always
+    environment:
+      DBMS_URL: http://dbms-service:8080/
+      API_URL: http://api-service:8081/
     networks:
       - movies-network
     ports:
@@ -63,7 +65,6 @@ services:
       - /home/wupdp/logs/controller:/app/logs
   prometheus:
     image: prom/prometheus
-    container_name: prometheus
     restart: always
     networks:
       - movies-network

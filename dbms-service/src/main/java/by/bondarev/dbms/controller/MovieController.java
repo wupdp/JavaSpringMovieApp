@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import by.bondarev.dbms.exception.ResourceNotFoundException;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/movies")
 public class MovieController {
@@ -96,5 +98,12 @@ public class MovieController {
         }
         logger.info("Deleted movie by id: {}", id);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    @PostMapping("/bulk")
+    public ResponseEntity<List<String>> saveBulkMovies(@RequestBody List<MovieDTO> movies) throws JsonProcessingException {
+        List<String> savedMovieNames = movieService.saveBulkMovies(movies);
+        logger.info("Saved bulk movies");
+        return ResponseEntity.status(HttpStatus.OK).contentType(MediaType.APPLICATION_JSON).body(savedMovieNames);
     }
 }

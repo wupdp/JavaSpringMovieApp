@@ -84,10 +84,16 @@ public class Movie {
         status.setName(movieDTO.getStatus());
 
         movie.setStatus(status);
-        // Преобразование наборов DTO в наборы entities
-        movie.setPersons(movieDTO.getPersons().stream().map(Person::fromDTO).collect(Collectors.toSet()));
-        movie.setGenres(movieDTO.getGenres().stream().map(Genre::fromDTO).collect(Collectors.toSet()));
-        movie.setCountries(movieDTO.getCountries().stream().map(Country::fromDTO).collect(Collectors.toSet()));
+        if (movieDTO.getPersons() != null) {
+            movie.setPersons(movieDTO.getPersons().stream().map(Person::fromDTO).collect(Collectors.toSet()));
+        }
+        if (movieDTO.getGenres() != null) {
+            movie.setGenres(movieDTO.getGenres().stream().map(Genre::fromDTO).collect(Collectors.toSet()));
+        }
+        if (movieDTO.getCountries() != null) {
+            movie.setCountries(movieDTO.getCountries().stream().map(Country::fromDTO).collect(Collectors.toSet()));
+        }
+
         return movie;
     }
 }

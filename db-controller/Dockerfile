@@ -7,11 +7,11 @@ WORKDIR /app
 
 COPY ./pom.xml ./
 
-RUN mvn dependency:go-offline
+RUN mvn dependency:go-offline -DexcludeArtifactIds=maven-checkstyle-plugin
 
 COPY ./src ./src
 
-RUN mvn clean install -DskipTests
+RUN mvn clean install -DskipTests -Pdocker
 
 FROM openjdk:21-jdk-slim AS RUN
 
@@ -22,6 +22,6 @@ WORKDIR /app
 
 COPY --from=build /app/target/*.jar /app/web-movie.jar
 
-EXPOSE 8081
+EXPOSE 8088
 
 CMD ["java", "-jar", "web-movie.jar"]

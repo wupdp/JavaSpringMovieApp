@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -23,17 +24,20 @@ public class MovieService {
     private final ObjectMapper objectMapper;
     private final EntityIdUpdater entityIdUpdater;
     private final RedisCache redisCache;
+    private final RequestCounterService requestCounterService;
     private static final Logger logger = LoggerFactory.getLogger(MovieService.class);
 
     @Autowired
-    public MovieService(MovieRepository movieRepository, ObjectMapper objectMapper, EntityIdUpdater entityIdUpdater, RedisCache redisCache) {
+    public MovieService(MovieRepository movieRepository, ObjectMapper objectMapper, EntityIdUpdater entityIdUpdater, RedisCache redisCache, RequestCounterService requestCounterService) {
         this.movieRepository = movieRepository;
         this.objectMapper = objectMapper;
         this.entityIdUpdater = entityIdUpdater;
         this.redisCache = redisCache;
+        this.requestCounterService = requestCounterService;
     }
 
     public String findMoviesByGenre(String genreName) throws JsonProcessingException {
+        requestCounterService.incrementRequestCounter();
         String cachedMovies = (String) redisCache.get(genreName);
         if (cachedMovies != null) {
             logger.info("Retrieved movies from cache by genre: {}", genreName);
@@ -48,6 +52,7 @@ public class MovieService {
     }
 
     public String findMoviesByCountry(String countryName) throws JsonProcessingException {
+        requestCounterService.incrementRequestCounter();
         String cachedMovies = (String) redisCache.get(countryName);
         if (cachedMovies != null) {
             logger.info("Retrieved movies from cache by country: {}", countryName);
@@ -62,6 +67,7 @@ public class MovieService {
     }
 
     public String findMoviesByPerson(String personName) throws JsonProcessingException {
+        requestCounterService.incrementRequestCounter();
         String cachedMovies = (String) redisCache.get(personName);
         if (cachedMovies != null) {
             logger.info("Retrieved movies from cache by person: {}", personName);
@@ -76,6 +82,7 @@ public class MovieService {
     }
 
     public String getAllMovies() throws JsonProcessingException {
+        requestCounterService.incrementRequestCounter();
         String cachedMovies = (String) redisCache.get("allMovies");
         if (cachedMovies != null) {
             logger.info("Retrieved all movies from cache");
@@ -90,6 +97,7 @@ public class MovieService {
     }
 
     public String getMovieById(Long id) throws JsonProcessingException {
+        requestCounterService.incrementRequestCounter();
         String cachedMovie = (String) redisCache.get("movie_" + id);
         if (cachedMovie != null) {
             logger.info("Retrieved movie from cache by id: {}", id);
@@ -105,6 +113,7 @@ public class MovieService {
     }
 
     public String getMovieByTitle(String title) throws JsonProcessingException {
+        requestCounterService.incrementRequestCounter();
         String cachedMovies = (String) redisCache.get("movie_" + title);
         if (cachedMovies != null) {
             logger.info("Retrieved movie from cache by title: {}", title);
@@ -119,6 +128,7 @@ public class MovieService {
     }
 
     public String saveMovie(MovieDTO movieDTO) throws JsonProcessingException {
+        requestCounterService.incrementRequestCounter();
         Optional<Long> existingMovieIdOptional = movieRepository.getIdByName(movieDTO.getName());
         existingMovieIdOptional.ifPresent(movieDTO::setId);
 
@@ -138,8 +148,22 @@ public class MovieService {
     }
 
     public boolean deleteMovieById(Long id) {
+        requestCounterService.incrementRequestCounter();
         movieRepository.deleteById(id);
         redisCache.delete("movie_" + id);
         return true;
     }
+
+    public List<String> saveBulkMovies(List<MovieDTO> movies) throws JsonProcessingException {
+        requestCounterService.incrementRequestCounter();
+        List<String> savedMovies = new ArrayList<>();
+        for (MovieDTO movieDTO : movies) {
+            String savedMovie = saveMovie(movieDTO);
+            if (savedMovie != null) {
+                savedMovies.add(movieDTO.getName());
+            }
+        }
+        return savedMovies;
+    }
+
 }
