@@ -1,0 +1,22 @@
+<div style="max-width: 100vw" class="container mt-3">
+  <div class="grid">
+    <div class="card" *ngFor="let movie of movies">
+      <a [routerLink]="['/movies', movie.id]">
+        <div class="card-body">
+          <h5 class="card-title">{{movie.name}}</h5>
+          <p class="card-text">Genres:
+            <ng-container *ngFor="let genre of movie.genres; let lastGenre=last">
+              {{genre.name}}{{lastGenre ? '' : ', '}}
+            </ng-container>
+          </p>
+          <p class="card-text">Production Countries:
+            <ng-container *ngFor="let country of movie.countries; let lastCountry=last">
+              {{country.name}}{{lastCountry ? '' : ', '}}
+            </ng-container>
+          </p>
+          <button class="btn btn-danger" (click)="deleteMovie(movie.id)">Удалить</button>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

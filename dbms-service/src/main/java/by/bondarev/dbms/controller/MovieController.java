@@ -15,6 +15,7 @@ import by.bondarev.dbms.exception.ResourceNotFoundException;
 import java.util.List;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/movies")
 public class MovieController {
 

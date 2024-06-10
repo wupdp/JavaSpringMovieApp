@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Tag(name = "Поиск фильмов", description = "Данный контроллер отвечает за поиск фильмов в базе данных " + "и внешних API с последующим обновлением БД")
 @RestController
+@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("/movie")
 public class DataBaseController {
     private final MovieService movieService;

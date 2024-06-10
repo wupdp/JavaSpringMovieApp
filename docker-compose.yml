@@ -38,6 +38,8 @@ services:
       DATABASE_URL: db-container:5432
     volumes:
       - /home/wupdp/logs/dbms:/app/logs
+    ports:
+      - "8000:8080"
 
   api-service:
     build: ./api-service
