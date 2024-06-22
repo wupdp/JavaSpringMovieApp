@@ -4,15 +4,15 @@ redis:
 
 postgres:
   image: postgres:latest
-  user: dbmsuser
+  user: "dbmsuser"
   password: "191688"
-  database: movieservicebd
+  database: "movieservicebd"
   storageClass: "manual"
   storage: 1Gi
 
 dbmsService:
   image: wupdp/dbms-service:latest
-  databaseUrl: db-container:5432
+  databaseUrl: "db-container:5432"
   volumeMount: /home/wupdp/logs/dbms
 
 apiService:
