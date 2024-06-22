@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: db-controller
+  template:
+    metadata:
+      labels:
+        app: db-controller
+    spec:
+      containers:
+        - name: db-controller
+          image: {{ .Values.dbController.image }}
+          volumeMounts:
+            - mountPath: /app/logs
+              name: controller-logs
+          ports:
+            - containerPort: 8088
+      volumes:
+        - name: controller-logs
+          hostPath:
+            path: {{ .Values.dbController.volumeMount }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-controller
+spec:
+  ports:
+    - port: 8088
+      targetPort: 8088
+  selector:
+    app: db-controller

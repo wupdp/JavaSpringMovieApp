@@ -26,7 +26,7 @@ services:
 
   dbms-service:
     build: ./dbms-service
-    image: dbms-service:latest
+    image: wupdp/dbms-service:latest
     container_name: dbms-service
     restart: always
     networks:
@@ -43,7 +43,7 @@ services:
 
   api-service:
     build: ./api-service
-    image: api-service:latest
+    image: wupdp/api-service:latest
     container_name: api-service
     restart: always
     networks:
@@ -54,7 +54,7 @@ services:
       - "8081:8081"
   db-controller:
     build: ./db-controller
-    image: db-controller
+    image: wupdp/db-controller
     container_name: db-controller
     restart: always
     networks:

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dbms-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dbms-service
+  template:
+    metadata:
+      labels:
+        app: dbms-service
+    spec:
+      containers:
+        - name: dbms-service
+          image: {{ .Values.dbmsService.image }}
+          env:
+            - name: DATABASE_URL
+              value: {{ .Values.dbmsService.databaseUrl }}
+          volumeMounts:
+            - mountPath: /app/logs
+              name: dbms-logs
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: dbms-logs
+          hostPath:
+            path: {{ .Values.dbmsService.volumeMount }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dbms-service
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: dbms-service

@@ -1,0 +1,24 @@
+redis:
+  image: redis:latest
+  password: "191688"
+
+postgres:
+  image: postgres:latest
+  user: dbmsuser
+  password: "191688"
+  database: movieservicebd
+  storageClass: "manual"
+  storage: 1Gi
+
+dbmsService:
+  image: wupdp/dbms-service:latest
+  databaseUrl: db-container:5432
+  volumeMount: /home/wupdp/logs/dbms
+
+apiService:
+  image: wupdp/api-service:latest
+  volumeMount: /home/wupdp/logs/api
+
+dbController:
+  image: wupdp/db-controller:latest
+  volumeMount: /home/wupdp/logs/controller
